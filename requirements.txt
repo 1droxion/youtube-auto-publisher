@@ -1,0 +1,8 @@
+yt-dlp>=2026.8.0
+openai>=1.100.0
+requests>=2.32.0
+Pillow>=11.0.0
+google-api-python-client>=2.179.0
+google-auth>=2.40.0
+google-auth-oauthlib>=1.2.2
+google-auth-httplib2>=0.2.0
