@@ -1,4 +1,4 @@
-yt-dlp>=2026.8.0
+yt-dlp[default]>=2026.8.0
 openai>=1.100.0
 requests>=2.32.0
 Pillow>=11.0.0
