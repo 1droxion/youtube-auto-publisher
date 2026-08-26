@@ -1,0 +1,3 @@
+# Add ONLY videos you own or have permission/license to reuse.
+# Format exactly like this:
+# RIGHTS_OK|https://www.youtube.com/watch?v=YOUR_VIDEO_ID
