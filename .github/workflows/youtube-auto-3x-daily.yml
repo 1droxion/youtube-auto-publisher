@@ -1,0 +1,88 @@
+name: YouTube Auto Publisher 3x Daily
+
+on:
+  schedule:
+    # GitHub cron runs in UTC. These are 8 AM, 2 PM, and 8 PM Central Daylight Time (CDT).
+    # During CST they run one hour earlier locally unless adjusted seasonally.
+    - cron: '0 13 * * *'
+    - cron: '0 19 * * *'
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: youtube-auto-publisher-3x-daily
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      YOUTUBE_TOKEN_JSON: ${{ secrets.YOUTUBE_TOKEN_JSON }}
+      AUDD_API_TOKEN: ${{ secrets.AUDD_API_TOKEN }}
+      OPENAI_TEXT_MODEL: gpt-5.6-terra
+      OPENAI_IMAGE_MODEL: gpt-image-2
+      AUTO_MUSIC_POLICY: stop
+      AUTO_PRIVACY: public
+      YOUTUBE_CATEGORY_ID: '24'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install FFmpeg and Deno
+        shell: bash
+        run: |
+          set -e
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg unzip
+          curl -fsSL https://deno.land/install.sh | sh
+          echo "$HOME/.deno/bin" >> "$GITHUB_PATH"
+
+      - name: Install Python requirements
+        run: python -m pip install -r requirements.txt
+
+      - name: Validate required secrets
+        shell: bash
+        run: |
+          set -e
+          test -n "$OPENAI_API_KEY" || (echo 'Missing OPENAI_API_KEY' && exit 1)
+          test -n "$YOUTUBE_TOKEN_JSON" || (echo 'Missing YOUTUBE_TOKEN_JSON' && exit 1)
+          test -n "$AUDD_API_TOKEN" || (echo 'Missing AUDD_API_TOKEN' && exit 1)
+
+      - name: Publish next rights-cleared video
+        run: python auto_publish.py
+
+      - name: Save published URL state
+        shell: bash
+        run: |
+          set -e
+          if git diff --quiet -- data/published_urls.json; then
+            echo 'No state change to commit.'
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add data/published_urls.json
+          git commit -m 'Record auto-published YouTube source'
+          git push
+
+      - name: Upload processing report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-auto-3x-output-${{ github.run_id }}
+          path: output/
+          if-no-files-found: warn
+          retention-days: 7
