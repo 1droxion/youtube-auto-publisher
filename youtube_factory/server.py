@@ -8,15 +8,16 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from .media import save_project_upload
 from .models import ProjectStatus
 from .normalize import normalize_project
+from .render import render_reaction_layout
 from .store import JsonStore
+from .transcribe import transcribe_project
 
 app = FastAPI(title="YouTube Factory V1")
 STORE = JsonStore()
 
-
 STYLE = """
 <style>
-body{font-family:Arial,sans-serif;background:#0b0d12;color:#f5f7fb;margin:0}main{max-width:1100px;margin:0 auto;padding:32px}nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}.brand{font-size:24px;font-weight:700}.muted{color:#9aa4b2}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:#151923;border:1px solid #242b38;border-radius:16px;padding:22px}input,select{width:100%;box-sizing:border-box;background:#0f131b;color:#fff;border:1px solid #30394a;border-radius:10px;padding:12px;margin:6px 0 14px}button,.button{display:inline-block;background:#fff;color:#111;border:0;border-radius:10px;padding:12px 18px;font-weight:700;cursor:pointer;text-decoration:none}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{text-align:left;padding:12px;border-bottom:1px solid #252c39}th{color:#9aa4b2;font-size:13px}.empty{text-align:center;color:#9aa4b2;padding:28px}.ok{color:#86efac}.warn{color:#fcd34d}.error{color:#fca5a5}@media(max-width:760px){.grid{grid-template-columns:1fr}}
+body{font-family:Arial,sans-serif;background:#0b0d12;color:#f5f7fb;margin:0}main{max-width:1100px;margin:0 auto;padding:32px}nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}.brand{font-size:24px;font-weight:700}.muted{color:#9aa4b2}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.card{background:#151923;border:1px solid #242b38;border-radius:16px;padding:22px}input,select{width:100%;box-sizing:border-box;background:#0f131b;color:#fff;border:1px solid #30394a;border-radius:10px;padding:12px;margin:6px 0 14px}button,.button{display:inline-block;background:#fff;color:#111;border:0;border-radius:10px;padding:12px 18px;font-weight:700;cursor:pointer;text-decoration:none;margin-right:8px}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{text-align:left;padding:12px;border-bottom:1px solid #252c39}th{color:#9aa4b2;font-size:13px}.empty{text-align:center;color:#9aa4b2;padding:28px}.ok{color:#86efac}.warn{color:#fcd34d}.error{color:#fca5a5}.actions form{display:inline-block;margin-top:8px}@media(max-width:760px){.grid{grid-template-columns:1fr}}
 </style>
 """
 
@@ -40,10 +41,10 @@ def dashboard_html() -> str:
         )
     body_rows = "".join(rows) or '<tr><td colspan="5" class="empty">No projects yet.</td></tr>'
     body = f"""
-<nav><div><div class='brand'>YouTube Factory</div><div class='muted'>Funny Reaction Long Video V1</div></div><div class='muted'>Milestone 3</div></nav>
+<nav><div><div class='brand'>YouTube Factory</div><div class='muted'>Funny Reaction Long Video V1</div></div><div class='muted'>Milestone 5</div></nav>
 <div class='grid'>
 <section class='card'><h2>Create Project</h2><form method='post' action='/projects'><label>Project name</label><input name='name' placeholder='Funniest gym fails reaction' required><label>Topic</label><input name='topic' placeholder='Optional topic idea'><label>Target length</label><select name='target_length'><option value=''>Auto</option><option>8</option><option>10</option><option>12</option><option>15</option></select><button type='submit'>Create Video Project</button></form></section>
-<section class='card'><h2>V1 Pipeline</h2><p class='muted'>Project → Upload → Normalize → Transcribe → Analyze → Edit → Render → Thumbnail → Metadata → YouTube.</p><p>Current milestone creates standardized 1920×1080 H.264/AAC working copies while preserving originals.</p></section>
+<section class='card'><h2>V1 Pipeline</h2><p class='muted'>Project → Upload → Normalize → Transcribe → Render → Analyze → Edit → Captions → Thumbnail → Metadata → YouTube.</p><p>Current milestone proves timestamped transcription and the first real source + reaction render.</p></section>
 </div>
 <section class='card' style='margin-top:18px'><h2>Projects</h2><table><thead><tr><th>Project</th><th>Status</th><th>Progress</th><th>Source</th><th>Reaction</th></tr></thead><tbody>{body_rows}</tbody></table></section>
 """
@@ -55,24 +56,43 @@ def project_html(project: dict) -> str:
     reaction = html.escape(project.get("reaction_filename") or "Not uploaded")
     uploaded = bool(project.get("source_filename") and project.get("reaction_filename"))
     normalized = bool(project.get("normalized_source_path") and project.get("normalized_reaction_path"))
-    if normalized:
-        status_note = "Both videos are normalized and ready for transcription."
+    transcribed = bool(project.get("source_transcript_path") and project.get("reaction_transcript_path"))
+    rendered = bool(project.get("render_v1_path"))
+
+    if rendered:
+        status_note = "Core V1 render is complete. Ready for smart editing/captions next."
         status_class = "ok"
+    elif transcribed:
+        status_note = "Transcription is complete. Create the first reaction render."
+        status_class = "ok"
+    elif normalized:
+        status_note = "Both videos are normalized. Transcribe them to continue."
+        status_class = "warn"
     elif uploaded:
         status_note = "Both videos are uploaded. Normalize them to continue."
         status_class = "warn"
     else:
         status_note = "Upload both videos to continue."
         status_class = "warn"
+
     error_html = f"<p class='error'>{html.escape(project.get('error') or '')}</p>" if project.get("error") else ""
-    normalize_button = f"<form method='post' action='/projects/{html.escape(project['id'])}/normalize'><button type='submit'>Normalize Videos</button></form>" if uploaded and not normalized else ""
+    actions = []
+    pid = html.escape(project["id"])
+    if uploaded and not normalized:
+        actions.append(f"<form method='post' action='/projects/{pid}/normalize'><button type='submit'>Normalize Videos</button></form>")
+    if normalized and not transcribed:
+        actions.append(f"<form method='post' action='/projects/{pid}/transcribe'><button type='submit'>Transcribe Videos</button></form>")
+    if normalized and transcribed and not rendered:
+        actions.append(f"<form method='post' action='/projects/{pid}/render-v1'><button type='submit'>Render 70/30 V1</button></form>")
+    action_html = "".join(actions)
+
     body = f"""
 <nav><div><div class='brand'>YouTube Factory</div><div class='muted'>{html.escape(project['name'])}</div></div><a class='button' href='/'>Dashboard</a></nav>
 <div class='grid'>
-<section class='card'><h2>Source Video</h2><p class='muted'>Current: {source}</p><form method='post' action='/projects/{html.escape(project['id'])}/upload/source' enctype='multipart/form-data'><input type='file' name='video' accept='.mp4,.mov,video/mp4,video/quicktime' required><button type='submit'>Upload Source</button></form></section>
-<section class='card'><h2>Reaction Video</h2><p class='muted'>Current: {reaction}</p><form method='post' action='/projects/{html.escape(project['id'])}/upload/reaction' enctype='multipart/form-data'><input type='file' name='video' accept='.mp4,.mov,video/mp4,video/quicktime' required><button type='submit'>Upload Reaction</button></form></section>
+<section class='card'><h2>Source Video</h2><p class='muted'>Current: {source}</p><form method='post' action='/projects/{pid}/upload/source' enctype='multipart/form-data'><input type='file' name='video' accept='.mp4,.mov,video/mp4,video/quicktime' required><button type='submit'>Upload Source</button></form></section>
+<section class='card'><h2>Reaction Video</h2><p class='muted'>Current: {reaction}</p><form method='post' action='/projects/{pid}/upload/reaction' enctype='multipart/form-data'><input type='file' name='video' accept='.mp4,.mov,video/mp4,video/quicktime' required><button type='submit'>Upload Reaction</button></form></section>
 </div>
-<section class='card' style='margin-top:18px'><h2>Status</h2><p class='{status_class}'>{html.escape(status_note)}</p><p>Status: {html.escape(project['status'])} · Progress: {int(project['progress'])}%</p>{error_html}{normalize_button}</section>
+<section class='card' style='margin-top:18px'><h2>Status</h2><p class='{status_class}'>{html.escape(status_note)}</p><p>Status: {html.escape(project['status'])} · Progress: {int(project['progress'])}%</p>{error_html}<div class='actions'>{action_html}</div></section>
 """
     return page(project["name"], body)
 
@@ -116,6 +136,9 @@ async def upload_video(project_id: str, role: str, video: UploadFile = File(...)
         f"{role}_size_bytes": saved.size_bytes,
         "normalized_source_path": None,
         "normalized_reaction_path": None,
+        "source_transcript_path": None,
+        "reaction_transcript_path": None,
+        "render_v1_path": None,
         "error": None,
     }
     current = STORE.update_project(project_id, **changes)
@@ -138,8 +161,54 @@ def normalize_videos(project_id: str) -> RedirectResponse:
             normalized_reaction_path=result["reaction"]["path"],
             source_duration_seconds=result["source"]["duration_seconds"],
             reaction_duration_seconds=result["reaction"]["duration_seconds"],
+            source_transcript_path=None,
+            reaction_transcript_path=None,
+            render_v1_path=None,
             status=ProjectStatus.PREPARING.value,
             progress=25,
+            error=None,
+        )
+    except Exception as exc:
+        STORE.update_project(project_id, status=ProjectStatus.FAILED.value, error=str(exc))
+    return RedirectResponse(f"/projects/{project_id}", status_code=303)
+
+
+@app.post("/projects/{project_id}/transcribe")
+def transcribe_videos(project_id: str) -> RedirectResponse:
+    project = STORE.get_project(project_id)
+    if not project:
+        raise HTTPException(404, "Project not found")
+    STORE.update_project(project_id, status=ProjectStatus.TRANSCRIBING.value, progress=30, error=None)
+    try:
+        result = transcribe_project(project)
+        STORE.update_project(
+            project_id,
+            source_transcript_path=result["source_transcript_path"],
+            reaction_transcript_path=result["reaction_transcript_path"],
+            source_transcript_text=result["source"].get("text", ""),
+            reaction_transcript_text=result["reaction"].get("text", ""),
+            status=ProjectStatus.TRANSCRIBING.value,
+            progress=40,
+            error=None,
+        )
+    except Exception as exc:
+        STORE.update_project(project_id, status=ProjectStatus.FAILED.value, error=str(exc))
+    return RedirectResponse(f"/projects/{project_id}", status_code=303)
+
+
+@app.post("/projects/{project_id}/render-v1")
+def render_v1(project_id: str) -> RedirectResponse:
+    project = STORE.get_project(project_id)
+    if not project:
+        raise HTTPException(404, "Project not found")
+    STORE.update_project(project_id, status=ProjectStatus.RENDERING.value, progress=45, error=None)
+    try:
+        result = render_reaction_layout(project)
+        STORE.update_project(
+            project_id,
+            render_v1_path=result["path"],
+            status=ProjectStatus.RENDERING.value,
+            progress=55,
             error=None,
         )
     except Exception as exc:
