@@ -8,6 +8,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from .media import save_project_upload
 from .models import ProjectStatus
 from .normalize import normalize_project
+from .reaction_library import copy_reaction_to_project, load_reactions
 from .render import render_reaction_layout
 from .store import JsonStore
 from .transcribe import transcribe_project
@@ -40,11 +41,12 @@ def dashboard_html() -> str:
             "</tr>"
         )
     body_rows = "".join(rows) or '<tr><td colspan="5" class="empty">No projects yet.</td></tr>'
+    reaction_count = len(load_reactions())
     body = f"""
-<nav><div><div class='brand'>YouTube Factory</div><div class='muted'>Funny Reaction Long Video V1</div></div><div class='muted'>Milestone 5</div></nav>
+<nav><div><div class='brand'>YouTube Factory</div><div class='muted'>Funny Reaction Long Video V1</div></div><div class='muted'>Reaction Factory clips: {reaction_count}</div></nav>
 <div class='grid'>
 <section class='card'><h2>Create Project</h2><form method='post' action='/projects'><label>Project name</label><input name='name' placeholder='Funniest gym fails reaction' required><label>Topic</label><input name='topic' placeholder='Optional topic idea'><label>Target length</label><select name='target_length'><option value=''>Auto</option><option>8</option><option>10</option><option>12</option><option>15</option></select><button type='submit'>Create Video Project</button></form></section>
-<section class='card'><h2>V1 Pipeline</h2><p class='muted'>Project → Upload → Normalize → Transcribe → Render → Analyze → Edit → Captions → Thumbnail → Metadata → YouTube.</p><p>Current milestone proves timestamped transcription and the first real source + reaction render.</p></section>
+<section class='card'><h2>V1 Pipeline</h2><p class='muted'>Project → Upload → Normalize → Transcribe → Render → Analyze → Edit → Captions → Thumbnail → Metadata → YouTube.</p><p>YouTube Factory can now reuse the existing Reaction Factory clip library or accept a manually uploaded reaction video.</p></section>
 </div>
 <section class='card' style='margin-top:18px'><h2>Projects</h2><table><thead><tr><th>Project</th><th>Status</th><th>Progress</th><th>Source</th><th>Reaction</th></tr></thead><tbody>{body_rows}</tbody></table></section>
 """
@@ -72,12 +74,14 @@ def project_html(project: dict) -> str:
         status_note = "Both videos are uploaded. Normalize them to continue."
         status_class = "warn"
     else:
-        status_note = "Upload both videos to continue."
+        status_note = "Upload a source, then upload a reaction or auto-pick one from Reaction Factory."
         status_class = "warn"
 
     error_html = f"<p class='error'>{html.escape(project.get('error') or '')}</p>" if project.get("error") else ""
     actions = []
     pid = html.escape(project["id"])
+    if project.get("source_filename") and not project.get("reaction_filename") and load_reactions():
+        actions.append(f"<form method='post' action='/projects/{pid}/reaction-factory'><button type='submit'>Use Reaction Factory Clip</button></form>")
     if uploaded and not normalized:
         actions.append(f"<form method='post' action='/projects/{pid}/normalize'><button type='submit'>Normalize Videos</button></form>")
     if normalized and not transcribed:
@@ -90,7 +94,7 @@ def project_html(project: dict) -> str:
 <nav><div><div class='brand'>YouTube Factory</div><div class='muted'>{html.escape(project['name'])}</div></div><a class='button' href='/'>Dashboard</a></nav>
 <div class='grid'>
 <section class='card'><h2>Source Video</h2><p class='muted'>Current: {source}</p><form method='post' action='/projects/{pid}/upload/source' enctype='multipart/form-data'><input type='file' name='video' accept='.mp4,.mov,video/mp4,video/quicktime' required><button type='submit'>Upload Source</button></form></section>
-<section class='card'><h2>Reaction Video</h2><p class='muted'>Current: {reaction}</p><form method='post' action='/projects/{pid}/upload/reaction' enctype='multipart/form-data'><input type='file' name='video' accept='.mp4,.mov,video/mp4,video/quicktime' required><button type='submit'>Upload Reaction</button></form></section>
+<section class='card'><h2>Reaction Video</h2><p class='muted'>Current: {reaction}</p><form method='post' action='/projects/{pid}/upload/reaction' enctype='multipart/form-data'><input type='file' name='video' accept='.mp4,.mov,video/mp4,video/quicktime' required><button type='submit'>Upload Reaction</button></form><p class='muted'>Or use an existing Reaction Factory clip automatically.</p></section>
 </div>
 <section class='card' style='margin-top:18px'><h2>Status</h2><p class='{status_class}'>{html.escape(status_note)}</p><p>Status: {html.escape(project['status'])} · Progress: {int(project['progress'])}%</p>{error_html}<div class='actions'>{action_html}</div></section>
 """
@@ -115,6 +119,33 @@ def project_page(project_id: str) -> str:
     if not project:
         raise HTTPException(404, "Project not found")
     return project_html(project)
+
+
+@app.post("/projects/{project_id}/reaction-factory")
+def use_reaction_factory(project_id: str) -> RedirectResponse:
+    project = STORE.get_project(project_id)
+    if not project:
+        raise HTTPException(404, "Project not found")
+    context = " ".join([project.get("name", ""), project.get("topic", "")]).strip()
+    try:
+        chosen = copy_reaction_to_project(project_id, context=context, preferred="auto")
+        current = STORE.update_project(
+            project_id,
+            reaction_filename=chosen["filename"],
+            reaction_path=chosen["path"],
+            reaction_size_bytes=chosen["size_bytes"],
+            reaction_factory_id=chosen["reaction_factory_id"],
+            reaction_factory_label=chosen["reaction_factory_label"],
+            normalized_reaction_path=None,
+            reaction_transcript_path=None,
+            render_v1_path=None,
+            error=None,
+        )
+        if current.get("source_filename"):
+            STORE.update_project(project_id, status=ProjectStatus.UPLOADED.value, progress=10)
+    except Exception as exc:
+        STORE.update_project(project_id, status=ProjectStatus.FAILED.value, error=str(exc))
+    return RedirectResponse(f"/projects/{project_id}", status_code=303)
 
 
 @app.post("/projects/{project_id}/upload/{role}")
