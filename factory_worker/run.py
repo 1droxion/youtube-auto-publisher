@@ -62,19 +62,32 @@ def duration(path: Path) -> float:
 def render(source: Path, reaction: Path, output: Path):
     source_audio = has_audio(source)
     reaction_audio = has_audio(reaction)
+    source_duration = duration(source)
+    if source_duration <= 0:
+        raise RuntimeError("Could not determine source video duration")
 
+    # 16:9 YouTube layout with no black empty areas:
+    # left 70% = source panel, right 30% = reaction panel.
+    # Each panel uses a blurred fill behind an uncropped foreground so vertical
+    # and horizontal clips both remain visible without wasting the frame.
     filter_parts = [
-        "[0:v]scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1[base]",
-        "[1:v]scale=560:-2:force_original_aspect_ratio=decrease,setsar=1[react]",
-        "[base][react]overlay=W-w-32:32:shortest=1[vout]",
+        "[0:v]split=2[srcbg][srcfg]",
+        "[srcbg]scale=1344:1080:force_original_aspect_ratio=increase,crop=1344:1080,gblur=sigma=28,setsar=1[srcbg2]",
+        "[srcfg]scale=1344:1080:force_original_aspect_ratio=decrease,setsar=1[srcfg2]",
+        "[srcbg2][srcfg2]overlay=(W-w)/2:(H-h)/2[srcpanel]",
+        "[1:v]split=2[reactbg][reactfg]",
+        "[reactbg]scale=576:1080:force_original_aspect_ratio=increase,crop=576:1080,gblur=sigma=28,setsar=1[reactbg2]",
+        "[reactfg]scale=576:1080:force_original_aspect_ratio=decrease,setsar=1[reactfg2]",
+        "[reactbg2][reactfg2]overlay=(W-w)/2:(H-h)/2[reactpanel]",
+        "[srcpanel][reactpanel]hstack=inputs=2[vout]",
     ]
 
     audio_map = []
     if source_audio and reaction_audio:
         filter_parts.extend([
-            "[0:a]volume=0.65[a0]",
-            "[1:a]volume=1.15[a1]",
-            "[a0][a1]amix=inputs=2:duration=shortest:dropout_transition=2[aout]",
+            "[0:a]aresample=async=1:first_pts=0,volume=0.85[a0]",
+            "[1:a]aresample=async=1:first_pts=0,volume=0.35[a1]",
+            "[a0][a1]amix=inputs=2:duration=first:dropout_transition=2[aout]",
         ])
         audio_map = ["-map", "[aout]"]
     elif source_audio:
@@ -89,6 +102,7 @@ def render(source: Path, reaction: Path, output: Path):
         "-filter_complex", ";".join(filter_parts),
         "-map", "[vout]",
         *audio_map,
+        "-t", f"{source_duration:.3f}",
         "-c:v", "libx264",
         "-preset", "medium",
         "-crf", "20",
@@ -96,11 +110,19 @@ def render(source: Path, reaction: Path, output: Path):
     ]
     if audio_map:
         cmd += ["-c:a", "aac", "-b:a", "192k", "-ar", "48000"]
-    cmd += ["-movflags", "+faststart", "-shortest", str(output)]
+    cmd += ["-movflags", "+faststart", str(output)]
 
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
         raise RuntimeError((result.stderr or result.stdout or "FFmpeg failed")[-4000:])
+
+    final_duration = duration(output)
+    # A small encoder/timestamp variance is normal; a large gap means the old
+    # reaction-driven cutoff bug returned.
+    if final_duration + 0.5 < source_duration:
+        raise RuntimeError(
+            f"Render ended early: source={source_duration:.3f}s output={final_duration:.3f}s"
+        )
 
 
 def upload_signed(signed_url: str, output: Path):
@@ -140,8 +162,13 @@ def main():
             print("Downloading reaction...")
             download(assets["reactionUrl"], reaction)
 
+            source_duration = duration(source)
+            reaction_duration = duration(reaction)
+            print(f"Source duration: {source_duration:.3f}s")
+            print(f"Reaction duration: {reaction_duration:.3f}s (loops to source length)")
+
             api("updateProgress", projectId=project_id, progress=45, status="Rendering")
-            print("Rendering 16:9 reaction video...")
+            print("Rendering full-length 16:9 70/30 reaction video...")
             render(source, reaction, output)
 
             api("updateProgress", projectId=project_id, progress=85, status="Uploading Render")
