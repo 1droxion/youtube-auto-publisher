@@ -1,0 +1,54 @@
+name: YouTube Factory Worker
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *'
+  push:
+    branches:
+      - youtube-factory-v1
+    paths:
+      - 'factory_worker/**'
+      - '.github/workflows/youtube-factory-worker.yml'
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: youtube-factory-worker
+  cancel-in-progress: false
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install FFmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install worker requirements
+        run: python -m pip install requests
+
+      - name: Get GitHub OIDC token
+        id: oidc
+        shell: bash
+        run: |
+          set -euo pipefail
+          token_json=$(curl -fsSL -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=youtube-factory-worker")
+          python -c 'import json,sys; print("token="+json.load(sys.stdin)["value"])' <<< "$token_json" >> "$GITHUB_OUTPUT"
+
+      - name: Process next queued Factory job
+        env:
+          FACTORY_OIDC_TOKEN: ${{ steps.oidc.outputs.token }}
+        run: python factory_worker/run.py
