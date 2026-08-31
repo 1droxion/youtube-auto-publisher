@@ -25,16 +25,17 @@ def render_reaction_layout(project: dict) -> dict:
     output = render_dir / "reaction_v1.mp4"
     temp = render_dir / ".reaction_v1.tmp.mp4"
 
-    # Main source stays full frame. Reaction is a clean 30% overlay in the
-    # upper-right with margin. This is intentionally simple for the first
-    # proof-of-core render.
+    # Reuse the proven Reaction Factory behavior: the reaction input loops so a
+    # short reaction clip never freezes or disappears before the source ends.
+    # For YouTube long-form we adapt that idea to a clean 16:9 layout instead
+    # of the Reel Factory's vertical top-30 / bottom-70 stack.
     filter_complex = (
-        "[1:v]scale=576:324:force_original_aspect_ratio=decrease,"
-        "pad=576:324:(ow-iw)/2:(oh-ih)/2[reaction];"
-        "[0:v][reaction]overlay=W-w-48:48:shortest=1[vout];"
+        "[1:v]scale=576:324:force_original_aspect_ratio=increase,"
+        "crop=576:324,setsar=1,fps=30[reaction];"
+        "[0:v][reaction]overlay=W-w-48:48:shortest=0:eof_action=repeat[vout];"
         "[0:a]volume=0.55[sourcea];"
         "[1:a]volume=1.0[reactiona];"
-        "[sourcea][reactiona]amix=inputs=2:duration=shortest:dropout_transition=2[aout]"
+        "[sourcea][reactiona]amix=inputs=2:duration=first:dropout_transition=2[aout]"
     )
 
     cmd = [
@@ -42,6 +43,8 @@ def render_reaction_layout(project: dict) -> dict:
         "-y",
         "-i",
         str(source_path),
+        "-stream_loop",
+        "-1",
         "-i",
         str(reaction_path),
         "-filter_complex",
