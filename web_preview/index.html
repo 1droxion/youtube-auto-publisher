@@ -6,13 +6,13 @@
 <title>Instagram 100 Screen Clone Player</title>
 <style>
 :root{--bg:#090b10;--panel:#141923;--panel2:#1c2330;--border:#2f3849;--text:#fff;--muted:#98a3b4;--accent:#7aa7ff;--ok:#4bd799;--danger:#ff6d8a}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}.wrap{max-width:1600px;margin:auto;padding:24px 18px}h1{margin:0 0 6px;font-size:30px}.sub{color:var(--muted);margin-bottom:16px;line-height:1.45}.controls{display:grid;grid-template-columns:minmax(300px,1fr) auto;gap:10px;margin-bottom:10px}.fileRow{display:grid;grid-template-columns:minmax(300px,1fr) auto auto;gap:10px;margin-bottom:12px}input[type=text],input[type=file]{width:100%;background:var(--panel);color:#fff;border:1px solid var(--border);border-radius:10px;padding:13px;font-size:15px}input[type=file]{padding:10px}button{border:1px solid var(--border);border-radius:10px;padding:13px 18px;background:var(--panel2);color:#fff;font-weight:800;font-size:14px;cursor:pointer}.primary{background:var(--accent);color:#08101e;border-color:transparent}.stop{background:#2a161c;color:#ff9caf}.error{display:none;color:#ff9caf;margin:8px 0}.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.pill{background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:9px 12px;color:var(--muted);font-size:13px}.pill b{color:#fff}.main-card{background:#000;border:1px solid var(--border);border-radius:16px;overflow:hidden;position:relative;margin-bottom:14px;min-height:620px}.main-label{position:absolute;z-index:3;left:10px;top:10px;background:rgba(0,0,0,.78);padding:8px 11px;border-radius:999px;font-size:12px}.main-holder{width:100%;min-height:620px;display:grid;place-items:center;background:#000}.main-holder iframe{width:100%;max-width:540px;height:620px;border:0;background:#fff}.placeholder{color:#8c96a7;text-align:center;padding:30px;line-height:1.55}.clone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}.clone{aspect-ratio:9/16;min-height:220px;background:#07090d;border:1px solid var(--border);border-radius:12px;overflow:hidden;position:relative}.clone.running{border-color:#2e7358}.clone canvas{width:100%;height:100%;display:block;background:#000;object-fit:cover}.clone-num{position:absolute;z-index:2;left:7px;top:7px;background:rgba(0,0,0,.72);padding:5px 7px;border-radius:999px;font-size:10px;color:#c8d1dd}.clone-status{position:absolute;z-index:2;left:7px;bottom:7px;background:rgba(0,0,0,.72);padding:5px 7px;border-radius:999px;font-size:10px;color:#c8d1dd}.running .clone-status{color:var(--ok)}.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#6d7787;margin-right:5px}.running .dot{background:var(--ok);box-shadow:0 0 10px var(--ok)}.notice{margin-top:16px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:13px;line-height:1.5}.hiddenMaster{position:fixed;left:-99999px;top:-99999px;width:10px;height:10px;opacity:0}.step{font-size:12px;color:var(--muted);margin:4px 0 8px}.ok{color:var(--ok)}@media(max-width:750px){.controls,.fileRow{grid-template-columns:1fr}.main-card,.main-holder{min-height:520px}.main-holder iframe{height:520px}.clone-grid{grid-template-columns:repeat(2,1fr)}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}.wrap{max-width:1600px;margin:auto;padding:24px 18px}h1{margin:0 0 6px;font-size:30px}.sub{color:var(--muted);margin-bottom:16px;line-height:1.45}.controls{display:grid;grid-template-columns:minmax(300px,1fr) auto;gap:10px;margin-bottom:10px}.fileRow{display:grid;grid-template-columns:minmax(300px,1fr) auto auto;gap:10px;margin-bottom:12px}input[type=text],input[type=file]{width:100%;background:var(--panel);color:#fff;border:1px solid var(--border);border-radius:10px;padding:13px;font-size:15px}input[type=file]{padding:10px}button{border:1px solid var(--border);border-radius:10px;padding:13px 18px;background:var(--panel2);color:#fff;font-weight:800;font-size:14px;cursor:pointer}.primary{background:var(--accent);color:#08101e;border-color:transparent}.stop{background:#2a161c;color:#ff9caf}.error{display:none;color:#ff9caf;margin:8px 0}.hint{margin:8px 0 14px;padding:12px 14px;border:1px solid #35506e;background:#101a27;border-radius:10px;color:#b8c6d8;font-size:13px;line-height:1.45}.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.pill{background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:9px 12px;color:var(--muted);font-size:13px}.pill b{color:#fff}.main-card{background:#000;border:1px solid var(--border);border-radius:16px;overflow:hidden;position:relative;margin-bottom:14px;min-height:620px}.main-label{position:absolute;z-index:3;left:10px;top:10px;background:rgba(0,0,0,.78);padding:8px 11px;border-radius:999px;font-size:12px}.main-holder{width:100%;min-height:620px;display:grid;place-items:center;background:#000}.main-holder iframe{width:100%;max-width:540px;height:620px;border:0;background:#fff}.placeholder{color:#8c96a7;text-align:center;padding:30px;line-height:1.55}.clone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}.clone{aspect-ratio:9/16;min-height:220px;background:#07090d;border:1px solid var(--border);border-radius:12px;overflow:hidden;position:relative}.clone.ready{border-color:#385d86}.clone.running{border-color:#2e7358}.clone canvas{width:100%;height:100%;display:block;background:#000}.clone-num{position:absolute;z-index:2;left:7px;top:7px;background:rgba(0,0,0,.72);padding:5px 7px;border-radius:999px;font-size:10px;color:#c8d1dd}.clone-status{position:absolute;z-index:2;left:7px;bottom:7px;background:rgba(0,0,0,.72);padding:5px 7px;border-radius:999px;font-size:10px;color:#c8d1dd}.ready .clone-status{color:#9ec9ff}.running .clone-status{color:var(--ok)}.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#6d7787;margin-right:5px}.ready .dot{background:#7aa7ff}.running .dot{background:var(--ok);box-shadow:0 0 10px var(--ok)}.notice{margin-top:16px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:13px;line-height:1.5}.hiddenMaster{position:fixed;left:-99999px;top:-99999px;width:10px;height:10px;opacity:0}.step{font-size:12px;color:var(--muted);margin:4px 0 8px}@media(max-width:750px){.controls,.fileRow{grid-template-columns:1fr}.main-card,.main-holder{min-height:520px}.main-holder iframe{height:520px}.clone-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>Instagram 100 Screen Clone Player</h1>
-  <div class="sub">Screen 1 is the real Instagram Reel/post. Screens 2-100 visually mirror one local video file, so all 99 clones show the actual same video and stay synchronized.</div>
+  <div class="sub">Screen 1 is the real Instagram Reel/post. Screens 2-100 mirror one local video file, so all 99 clones show the same actual video in sync.</div>
 
   <div class="step">1. Paste the Instagram Reel/Post URL for the real top screen.</div>
   <div class="controls">
@@ -20,19 +20,20 @@
     <button id="loadInstagram">LOAD INSTAGRAM</button>
   </div>
 
-  <div class="step">2. Choose the same video as an MP4/MOV/WebM file for the 99 visual clones.</div>
+  <div class="step">2. Choose the same video file. As soon as you choose it, all 99 clone screens will show the video frame.</div>
   <div class="fileRow">
     <input id="videoFile" type="file" accept="video/mp4,video/webm,video/quicktime,video/*">
     <button id="startAll" class="primary">START ALL CLONES</button>
     <button id="stopAll" class="stop">STOP</button>
   </div>
 
+  <div class="hint"><b>Why the clones can be black:</b> loading an Instagram URL only loads the real Instagram player above. The browser does not let this page copy the video pixels out of Instagram's iframe. Choose the actual MP4/MOV/WebM file here, then all 99 clones will display it immediately.</div>
   <div id="error" class="error"></div>
   <div class="stats">
     <div class="pill">Real Instagram screen: <b>1</b></div>
     <div class="pill">Video clones: <b>99</b></div>
-    <div class="pill">Clone video: <b id="fileStatus">Not loaded</b></div>
-    <div class="pill">Status: <b id="overall">Idle</b></div>
+    <div class="pill">Clone video: <b id="fileStatus">Choose file</b></div>
+    <div class="pill">Status: <b id="overall">Waiting for video file</b></div>
   </div>
 
   <div class="main-card">
@@ -43,12 +44,11 @@
   <div id="cloneGrid" class="clone-grid"></div>
   <video id="masterVideo" class="hiddenMaster" playsinline muted preload="auto"></video>
 
-  <div class="notice"><b>How it works:</b> the Instagram player is real only on Screen 1. The 99 boxes below are canvas clones of the local video file you choose. <b>START ALL CLONES</b> starts one local master video and mirrors every frame into all 99 boxes at the same time, so they visibly play in perfect sync without creating 99 Instagram sessions or views.</div>
+  <div class="notice"><b>Clone behavior:</b> after you choose the video file, every clone shows the first actual video frame. Press <b>START ALL CLONES</b> and all 99 visual clones play together from the same master video. These clone boxes are not separate Instagram sessions or views.</div>
 </div>
 
 <script>
 const TOTAL=100;
-let currentInstagram=null;
 let objectUrl=null;
 let rafId=null;
 const holder=document.getElementById('mainHolder');
@@ -62,13 +62,19 @@ const canvases=[];
 for(let i=2;i<=TOTAL;i++){
   const box=document.createElement('div');
   box.className='clone';
-  box.innerHTML='<div class="clone-num">Screen '+String(i).padStart(3,'0')+' · CLONE</div><canvas></canvas><div class="clone-status"><span class="dot"></span><span>Waiting</span></div>';
+  box.innerHTML='<div class="clone-num">Screen '+String(i).padStart(3,'0')+' · CLONE</div><canvas width="270" height="480"></canvas><div class="clone-status"><span class="dot"></span><span>Choose video file</span></div>';
   grid.appendChild(box);
   canvases.push(box.querySelector('canvas'));
 }
 
 function setError(msg){error.textContent=msg||'';error.style.display=msg?'block':'none';}
-
+function setCloneState(state,label){
+  document.querySelectorAll('.clone').forEach(x=>{
+    x.classList.remove('ready','running');
+    if(state)x.classList.add(state);
+    x.querySelector('.clone-status span:last-child').textContent=label;
+  });
+}
 function parseInstagram(value){
   try{
     const u=new URL(value.trim());
@@ -78,78 +84,90 @@ function parseInstagram(value){
     if(p.length<2 || !['reel','reels','p','tv'].includes(p[0])) return null;
     const kind=p[0]==='reels'?'reel':p[0];
     const code=p[1];
-    return {kind,code,canonical:'https://www.instagram.com/'+kind+'/'+code+'/',embed:'https://www.instagram.com/'+kind+'/'+code+'/embed/'};
+    return {embed:'https://www.instagram.com/'+kind+'/'+code+'/embed/'};
   }catch(e){return null;}
 }
-
 function loadInstagram(){
   const parsed=parseInstagram(document.getElementById('url').value);
   if(!parsed){setError('Paste a valid public Instagram Reel or post URL.');return;}
   setError('');
-  currentInstagram=parsed;
   holder.innerHTML='<iframe src="'+parsed.embed+'" title="Instagram post" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen scrolling="yes"></iframe>';
 }
-
-function setupCanvases(){
-  const vw=master.videoWidth||720, vh=master.videoHeight||1280;
-  canvases.forEach(c=>{c.width=vw;c.height=vh;});
-  drawFrame();
+function drawOneFrame(){
+  if(master.readyState<2 || !master.videoWidth || !master.videoHeight) return false;
+  const vw=master.videoWidth, vh=master.videoHeight;
+  canvases.forEach(c=>{
+    if(c.width!==vw||c.height!==vh){c.width=vw;c.height=vh;}
+    const ctx=c.getContext('2d',{alpha:false});
+    ctx.drawImage(master,0,0,vw,vh);
+  });
+  return true;
 }
-
-function drawFrame(){
-  if(master.readyState>=2 && master.videoWidth && master.videoHeight){
-    const vw=master.videoWidth, vh=master.videoHeight;
-    canvases.forEach(c=>{
-      const ctx=c.getContext('2d',{alpha:false});
-      if(c.width!==vw||c.height!==vh){c.width=vw;c.height=vh;}
-      ctx.drawImage(master,0,0,c.width,c.height);
-    });
+function renderLoop(){
+  drawOneFrame();
+  if(!master.paused && !master.ended) rafId=requestAnimationFrame(renderLoop);
+}
+function showPreviewFrame(){
+  if(drawOneFrame()){
+    setCloneState('ready','Ready');
+    overall.textContent='99 clones loaded';
   }
-  if(!master.paused && !master.ended) rafId=requestAnimationFrame(drawFrame);
 }
-
 function loadLocalVideo(file){
+  setError('');
+  if(rafId) cancelAnimationFrame(rafId);
+  master.pause();
   if(objectUrl) URL.revokeObjectURL(objectUrl);
   objectUrl=URL.createObjectURL(file);
   master.src=objectUrl;
+  master.muted=true;
+  master.playsInline=true;
+  master.preload='auto';
+  fileStatus.textContent='Loading...';
+  overall.textContent='Loading clone video...';
+  setCloneState('', 'Loading video...');
   master.load();
-  fileStatus.textContent='Loading…';
+
   master.onloadedmetadata=()=>{
     fileStatus.textContent=file.name;
-    overall.textContent='Ready';
-    document.querySelectorAll('.clone-status span:last-child').forEach(x=>x.textContent='Ready');
-    setupCanvases();
+    try{master.currentTime=Math.min(0.05, Math.max(0, master.duration/1000));}catch(e){}
   };
-  master.onerror=()=>{fileStatus.textContent='Load failed';setError('That video file could not be loaded. Try MP4 (H.264).');};
+  master.onloadeddata=()=>{
+    fileStatus.textContent=file.name;
+    showPreviewFrame();
+  };
+  master.oncanplay=()=>showPreviewFrame();
+  master.onseeked=()=>showPreviewFrame();
+  master.onerror=()=>{
+    fileStatus.textContent='Load failed';
+    overall.textContent='Video load failed';
+    setError('That video file could not be loaded. Try an MP4 encoded with H.264.');
+    setCloneState('', 'Load failed');
+  };
 }
-
 async function startClones(){
-  if(!master.src){setError('Choose the video file first so Screens 2-100 can show the actual video.');return;}
+  if(!master.src){setError('Choose the video file first. The Instagram URL alone cannot fill the 99 clone screens.');return;}
   setError('');
   if(rafId) cancelAnimationFrame(rafId);
   try{
+    master.pause();
     master.currentTime=0;
     master.muted=true;
     await master.play();
-    overall.textContent='Playing';
-    document.querySelectorAll('.clone').forEach(x=>{x.classList.add('running');x.querySelector('.clone-status span:last-child').textContent='Playing';});
-    drawFrame();
+    overall.textContent='Playing all 99 clones';
+    setCloneState('running','Playing');
+    renderLoop();
   }catch(e){setError('Browser blocked playback. Click START ALL CLONES again.');}
 }
-
 function stopClones(){
   master.pause();
   if(rafId) cancelAnimationFrame(rafId);
   rafId=null;
   overall.textContent='Stopped';
-  document.querySelectorAll('.clone').forEach(x=>{x.classList.remove('running');x.querySelector('.clone-status span:last-child').textContent='Stopped';});
+  setCloneState('ready','Stopped');
+  showPreviewFrame();
 }
-
-master.addEventListener('ended',()=>{
-  overall.textContent='Finished';
-  document.querySelectorAll('.clone').forEach(x=>{x.classList.remove('running');x.querySelector('.clone-status span:last-child').textContent='Finished';});
-});
-
+master.addEventListener('ended',()=>{overall.textContent='Finished';setCloneState('ready','Finished');showPreviewFrame();});
 document.getElementById('loadInstagram').addEventListener('click',loadInstagram);
 document.getElementById('videoFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(f)loadLocalVideo(f);});
 document.getElementById('startAll').addEventListener('click',startClones);
