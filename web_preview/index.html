@@ -3,48 +3,110 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>1 Screen YouTube Watch</title>
+<title>10 Screen Playback Test</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#0b0d12;color:#fff;font-family:Arial,Helvetica,sans-serif}.wrap{max-width:1100px;margin:auto;padding:32px 20px}h1{margin:0 0 8px;font-size:30px}.sub{color:#9ba5b5;margin-bottom:20px}.controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}input{flex:1;min-width:280px;background:#151922;color:#fff;border:1px solid #30394b;border-radius:10px;padding:14px;font-size:16px}button{background:#6ea8fe;color:#07111f;border:0;border-radius:10px;padding:14px 20px;font-size:16px;font-weight:800;cursor:pointer}.player{width:100%;aspect-ratio:16/9;background:#000;border:1px solid #30394b;border-radius:14px;overflow:hidden;display:grid;place-items:center}.player iframe{width:100%;height:100%;border:0}.msg{color:#aaa;text-align:center;padding:20px}.err{color:#ff9caf;margin-top:12px;display:none}.note{color:#8d97a6;font-size:13px;margin-top:12px}@media(max-width:620px){h1{font-size:24px}.controls{display:block}input,button{width:100%}button{margin-top:10px}}
+:root{--bg:#0b0d12;--panel:#151922;--panel2:#1d2431;--border:#30394b;--text:#fff;--muted:#9ba5b5;--accent:#6ea8fe;--ok:#48d597}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}.wrap{max-width:1500px;margin:auto;padding:28px 20px}h1{margin:0 0 6px;font-size:30px}.sub{color:var(--muted);margin-bottom:18px;line-height:1.45}.controls{display:grid;grid-template-columns:minmax(300px,1fr) auto auto;gap:10px;margin-bottom:14px}input{background:var(--panel);color:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;font-size:16px}button{border:1px solid var(--border);border-radius:10px;padding:14px 20px;background:var(--panel2);color:#fff;font-weight:800;font-size:15px;cursor:pointer}.primary{background:var(--accent);color:#07111f;border-color:transparent}.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.pill{background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:9px 12px;color:var(--muted);font-size:13px}.pill b{color:#fff}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.screen{background:#000;border:1px solid var(--border);border-radius:14px;overflow:hidden;min-height:300px;position:relative}.screen.real{grid-column:span 2;min-height:520px}.screen iframe{width:100%;height:100%;border:0;display:block}.screen-head{position:absolute;z-index:3;left:10px;top:10px;background:rgba(0,0,0,.72);padding:7px 10px;border-radius:999px;font-size:12px}.sim-body{height:100%;min-height:300px;display:grid;place-items:center;background:radial-gradient(circle at center,#1c2431,#080a0e)}.sim-center{text-align:center}.status{font-size:22px;font-weight:800}.timer{margin-top:10px;color:var(--muted);font-variant-numeric:tabular-nums}.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#697487;margin-right:7px}.running .dot{background:var(--ok);box-shadow:0 0 16px var(--ok)}.running .status{color:var(--ok)}.notice{margin-top:16px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:13px;line-height:1.5}.error{display:none;margin:10px 0;color:#ff9caf}.ig-wrap{height:100%;overflow:auto;background:#fff;display:flex;justify-content:center;align-items:flex-start;padding:42px 10px 10px}.placeholder{height:100%;min-height:480px;display:grid;place-items:center;color:#858fa0;text-align:center;padding:30px}@media(max-width:800px){.controls{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.screen.real{grid-column:span 1;min-height:360px}.screen{min-height:240px}.sim-body{min-height:240px}}
 </style>
 </head>
 <body>
 <div class="wrap">
-<h1>1 Screen YouTube Watch</h1>
-<div class="sub">Paste one YouTube URL and watch the video in one normal YouTube player.</div>
-<div class="controls">
-<input id="url" autocomplete="off" placeholder="https://www.youtube.com/watch?v=...">
-<button id="load">LOAD VIDEO</button>
+  <h1>10 Screen Playback Test</h1>
+  <div class="sub">Paste a public YouTube or Instagram URL. Screen 1 is the real platform player/embed. Screens 2-10 are synchronized simulations for UI/load testing.</div>
+  <div class="controls">
+    <input id="url" autocomplete="off" placeholder="Paste YouTube or Instagram URL">
+    <button id="load">LOAD URL</button>
+    <button id="start" class="primary">START 10</button>
+  </div>
+  <div id="error" class="error">Please paste a supported YouTube or Instagram URL.</div>
+  <div class="stats">
+    <div class="pill">Real platform players: <b>1</b></div>
+    <div class="pill">Simulated screens: <b>9</b></div>
+    <div class="pill">Status: <b id="overall">Idle</b></div>
+  </div>
+  <div class="grid" id="grid">
+    <div class="screen real" id="realScreen"><div class="screen-head">Screen 1 · REAL</div><div class="placeholder">Paste a YouTube or Instagram URL, then click <b>LOAD URL</b>.</div></div>
+  </div>
+  <div class="notice"><b>Important:</b> this test page does not create 10 platform views. Only Screen 1 is a real YouTube/Instagram embed. Screens 2-10 are local simulations. Instagram does not expose a supported web API for us to remotely press Play, so on Instagram you press Play on Screen 1 yourself.</div>
 </div>
-<div id="player" class="player"><div class="msg">Paste a YouTube URL above and click <b>LOAD VIDEO</b>.</div></div>
-<div id="err" class="err">Please paste a valid YouTube URL.</div>
-<div class="note">Some videos cannot be embedded if the uploader has disabled embedding or YouTube requires the video to open on youtube.com.</div>
-</div>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script async src="https://www.instagram.com/embed.js"></script>
 <script>
-function getYouTubeId(value){
- try{
-  const u=new URL(value.trim());
-  const host=u.hostname.replace(/^www\./,'');
-  if(host==='youtu.be') return u.pathname.split('/').filter(Boolean)[0]||null;
-  if(host==='youtube.com'||host==='m.youtube.com'||host==='music.youtube.com'){
-   const v=u.searchParams.get('v'); if(v) return v;
-   const p=u.pathname.split('/').filter(Boolean);
-   for(let i=0;i<p.length-1;i++) if(['embed','shorts','live'].includes(p[i])) return p[i+1];
+const TOTAL=10;
+let ytPlayer=null;
+let loadedType=null;
+let simTimer=null;
+let elapsed=0;
+const grid=document.getElementById('grid');
+const realScreen=document.getElementById('realScreen');
+const errorEl=document.getElementById('error');
+const overall=document.getElementById('overall');
+
+for(let i=2;i<=TOTAL;i++){
+  const el=document.createElement('div');
+  el.className='screen sim';
+  el.innerHTML='<div class="screen-head">Screen '+i+' · SIMULATED</div><div class="sim-body"><div class="sim-center"><div class="status"><span class="dot"></span><span>Idle</span></div><div class="timer">00:00</div></div></div>';
+  grid.appendChild(el);
+}
+
+function parseUrl(value){
+  try{
+    const u=new URL(value.trim());
+    const host=u.hostname.replace(/^www\./,'');
+    if(host==='youtu.be') return {type:'youtube',id:u.pathname.split('/').filter(Boolean)[0]||null,url:u.href};
+    if(host==='youtube.com'||host==='m.youtube.com'||host==='music.youtube.com'){
+      const v=u.searchParams.get('v'); if(v) return {type:'youtube',id:v,url:u.href};
+      const p=u.pathname.split('/').filter(Boolean);
+      for(let i=0;i<p.length-1;i++) if(['embed','shorts','live'].includes(p[i])) return {type:'youtube',id:p[i+1],url:u.href};
+    }
+    if(host==='instagram.com'||host==='m.instagram.com'){
+      const p=u.pathname.split('/').filter(Boolean);
+      if(p.length>=2 && ['reel','reels','p','tv'].includes(p[0])) return {type:'instagram',url:u.origin+'/'+p[0]+'/'+p[1]+'/'};
+    }
+  }catch(e){}
+  return null;
+}
+
+function resetSimulation(){
+  clearInterval(simTimer);simTimer=null;elapsed=0;overall.textContent='Idle';
+  document.querySelectorAll('.sim').forEach(el=>{
+    el.classList.remove('running');
+    el.querySelector('.status span:last-child').textContent='Idle';
+    el.querySelector('.timer').textContent='00:00';
+  });
+}
+function fmt(s){const m=Math.floor(s/60),sec=s%60;return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0');}
+function startSimulation(){
+  resetSimulation();overall.textContent='Running';
+  document.querySelectorAll('.sim').forEach(el=>{el.classList.add('running');el.querySelector('.status span:last-child').textContent='Playing';});
+  simTimer=setInterval(()=>{elapsed++;document.querySelectorAll('.sim .timer').forEach(t=>t.textContent=fmt(elapsed));},1000);
+}
+
+function loadUrl(){
+  const parsed=parseUrl(document.getElementById('url').value);
+  resetSimulation();
+  if(!parsed){errorEl.style.display='block';return;}
+  errorEl.style.display='none';loadedType=parsed.type;ytPlayer=null;
+  if(parsed.type==='youtube'){
+    realScreen.innerHTML='<div class="screen-head">Screen 1 · REAL YOUTUBE</div><div id="ytReal" style="width:100%;height:100%;min-height:520px"></div>';
+    const build=()=>{ytPlayer=new YT.Player('ytReal',{videoId:parsed.id,playerVars:{playsinline:1,rel:0},events:{onReady:()=>{overall.textContent='Ready';}}});};
+    if(window.YT&&YT.Player) build(); else window.onYouTubeIframeAPIReady=build;
+  } else {
+    realScreen.innerHTML='<div class="screen-head">Screen 1 · REAL INSTAGRAM</div><div class="ig-wrap"><blockquote class="instagram-media" data-instgrm-permalink="'+parsed.url+'" data-instgrm-version="14" style="background:#fff;border:0;margin:0;max-width:540px;min-width:326px;width:100%"></blockquote></div>';
+    overall.textContent='Ready';
+    setTimeout(()=>{if(window.instgrm&&instgrm.Embeds)instgrm.Embeds.process();},100);
   }
- }catch(e){}
- return null;
 }
-function loadVideo(){
- const id=getYouTubeId(document.getElementById('url').value);
- const player=document.getElementById('player');
- const err=document.getElementById('err');
- if(!id){err.style.display='block';return;}
- err.style.display='none';
- const origin=encodeURIComponent(location.origin);
- player.innerHTML='<iframe src="https://www.youtube.com/embed/'+encodeURIComponent(id)+'?playsinline=1&enablejsapi=1&origin='+origin+'" title="YouTube video player" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>';
+
+function startAll(){
+  if(!loadedType){errorEl.style.display='block';return;}
+  errorEl.style.display='none';startSimulation();
+  if(loadedType==='youtube'&&ytPlayer&&typeof ytPlayer.playVideo==='function') ytPlayer.playVideo();
 }
-document.getElementById('load').addEventListener('click',loadVideo);
-document.getElementById('url').addEventListener('keydown',e=>{if(e.key==='Enter')loadVideo();});
+
+document.getElementById('load').addEventListener('click',loadUrl);
+document.getElementById('start').addEventListener('click',startAll);
+document.getElementById('url').addEventListener('keydown',e=>{if(e.key==='Enter')loadUrl();});
 </script>
 </body>
 </html>
