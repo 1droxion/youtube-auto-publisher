@@ -3,54 +3,71 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Instagram 100 Screen Clone Test</title>
+<title>Instagram 100 Screen Clone Player</title>
 <style>
-:root{--bg:#090b10;--panel:#141923;--panel2:#1c2330;--border:#2f3849;--text:#fff;--muted:#98a3b4;--accent:#7aa7ff;--ok:#4bd799;--pink:#ff4f8a}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}.wrap{max-width:1500px;margin:auto;padding:24px 18px}h1{margin:0 0 6px;font-size:30px}.sub{color:var(--muted);margin-bottom:16px;line-height:1.45}.controls{display:grid;grid-template-columns:minmax(320px,1fr) auto auto;gap:10px;margin-bottom:12px}input{background:var(--panel);color:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;font-size:16px}button{border:1px solid var(--border);border-radius:10px;padding:14px 20px;background:var(--panel2);color:#fff;font-weight:800;font-size:15px;cursor:pointer}.primary{background:var(--accent);color:#08101e;border-color:transparent}.error{display:none;color:#ff9caf;margin:8px 0}.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.pill{background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:9px 12px;color:var(--muted);font-size:13px}.pill b{color:#fff}.main-card{background:#000;border:1px solid var(--border);border-radius:16px;overflow:hidden;position:relative;margin-bottom:14px;min-height:620px}.main-label{position:absolute;z-index:3;left:10px;top:10px;background:rgba(0,0,0,.75);padding:8px 11px;border-radius:999px;font-size:12px}.main-holder{width:100%;min-height:620px;display:grid;place-items:center;background:#000}.main-holder iframe{width:100%;max-width:540px;height:620px;border:0;background:#fff}.placeholder{color:#8c96a7;text-align:center;padding:30px;line-height:1.5}.clone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:8px}.clone{aspect-ratio:9/16;min-height:200px;background:linear-gradient(180deg,#171b24,#0d1016);border:1px solid var(--border);border-radius:12px;padding:9px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;position:relative}.clone::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 35%,rgba(255,79,138,.12),transparent 45%);pointer-events:none}.clone.running{border-color:#2e7358;background:linear-gradient(180deg,#14231d,#0d1512)}.clone-num{font-size:11px;color:var(--muted);position:relative;z-index:1}.clone-center{text-align:center;position:relative;z-index:1}.ig{font-size:28px;margin-bottom:8px}.status{font-weight:800;font-size:13px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#6d7787;margin-right:6px}.running .dot{background:var(--ok);box-shadow:0 0 12px var(--ok)}.running .status{color:var(--ok)}.short{font-size:10px;color:#778293;margin-top:7px;word-break:break-all}.timer{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;position:relative;z-index:1}.notice{margin-top:16px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:13px;line-height:1.5}.fallback{margin-top:10px}.fallback a{color:#9ebcff}.hidden{display:none}@media(max-width:700px){.controls{grid-template-columns:1fr}.main-card,.main-holder{min-height:520px}.main-holder iframe{height:520px}.clone-grid{grid-template-columns:repeat(2,1fr)}}
+:root{--bg:#090b10;--panel:#141923;--panel2:#1c2330;--border:#2f3849;--text:#fff;--muted:#98a3b4;--accent:#7aa7ff;--ok:#4bd799;--danger:#ff6d8a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}.wrap{max-width:1600px;margin:auto;padding:24px 18px}h1{margin:0 0 6px;font-size:30px}.sub{color:var(--muted);margin-bottom:16px;line-height:1.45}.controls{display:grid;grid-template-columns:minmax(300px,1fr) auto;gap:10px;margin-bottom:10px}.fileRow{display:grid;grid-template-columns:minmax(300px,1fr) auto auto;gap:10px;margin-bottom:12px}input[type=text],input[type=file]{width:100%;background:var(--panel);color:#fff;border:1px solid var(--border);border-radius:10px;padding:13px;font-size:15px}input[type=file]{padding:10px}button{border:1px solid var(--border);border-radius:10px;padding:13px 18px;background:var(--panel2);color:#fff;font-weight:800;font-size:14px;cursor:pointer}.primary{background:var(--accent);color:#08101e;border-color:transparent}.stop{background:#2a161c;color:#ff9caf}.error{display:none;color:#ff9caf;margin:8px 0}.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.pill{background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:9px 12px;color:var(--muted);font-size:13px}.pill b{color:#fff}.main-card{background:#000;border:1px solid var(--border);border-radius:16px;overflow:hidden;position:relative;margin-bottom:14px;min-height:620px}.main-label{position:absolute;z-index:3;left:10px;top:10px;background:rgba(0,0,0,.78);padding:8px 11px;border-radius:999px;font-size:12px}.main-holder{width:100%;min-height:620px;display:grid;place-items:center;background:#000}.main-holder iframe{width:100%;max-width:540px;height:620px;border:0;background:#fff}.placeholder{color:#8c96a7;text-align:center;padding:30px;line-height:1.55}.clone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}.clone{aspect-ratio:9/16;min-height:220px;background:#07090d;border:1px solid var(--border);border-radius:12px;overflow:hidden;position:relative}.clone.running{border-color:#2e7358}.clone canvas{width:100%;height:100%;display:block;background:#000;object-fit:cover}.clone-num{position:absolute;z-index:2;left:7px;top:7px;background:rgba(0,0,0,.72);padding:5px 7px;border-radius:999px;font-size:10px;color:#c8d1dd}.clone-status{position:absolute;z-index:2;left:7px;bottom:7px;background:rgba(0,0,0,.72);padding:5px 7px;border-radius:999px;font-size:10px;color:#c8d1dd}.running .clone-status{color:var(--ok)}.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#6d7787;margin-right:5px}.running .dot{background:var(--ok);box-shadow:0 0 10px var(--ok)}.notice{margin-top:16px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:13px;line-height:1.5}.hiddenMaster{position:fixed;left:-99999px;top:-99999px;width:10px;height:10px;opacity:0}.step{font-size:12px;color:var(--muted);margin:4px 0 8px}.ok{color:var(--ok)}@media(max-width:750px){.controls,.fileRow{grid-template-columns:1fr}.main-card,.main-holder{min-height:520px}.main-holder iframe{height:520px}.clone-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>Instagram 100 Screen Clone Test</h1>
-  <div class="sub">Instagram only. Screen 1 is the real Instagram Reel/post embed. Screens 2-100 are lightweight visual clones of the same loaded post status.</div>
+  <h1>Instagram 100 Screen Clone Player</h1>
+  <div class="sub">Screen 1 is the real Instagram Reel/post. Screens 2-100 visually mirror one local video file, so all 99 clones show the actual same video and stay synchronized.</div>
+
+  <div class="step">1. Paste the Instagram Reel/Post URL for the real top screen.</div>
   <div class="controls">
-    <input id="url" autocomplete="off" placeholder="Paste Instagram Reel/Post URL">
-    <button id="load">LOAD INSTAGRAM</button>
-    <button id="start" class="primary">START CLONES</button>
+    <input id="url" type="text" autocomplete="off" placeholder="https://www.instagram.com/reel/.../">
+    <button id="loadInstagram">LOAD INSTAGRAM</button>
   </div>
-  <div id="error" class="error">Paste a public Instagram Reel or post URL.</div>
+
+  <div class="step">2. Choose the same video as an MP4/MOV/WebM file for the 99 visual clones.</div>
+  <div class="fileRow">
+    <input id="videoFile" type="file" accept="video/mp4,video/webm,video/quicktime,video/*">
+    <button id="startAll" class="primary">START ALL CLONES</button>
+    <button id="stopAll" class="stop">STOP</button>
+  </div>
+
+  <div id="error" class="error"></div>
   <div class="stats">
     <div class="pill">Real Instagram screen: <b>1</b></div>
-    <div class="pill">Visual clones: <b>99</b></div>
-    <div class="pill">Clone status: <b id="overall">Idle</b></div>
+    <div class="pill">Video clones: <b>99</b></div>
+    <div class="pill">Clone video: <b id="fileStatus">Not loaded</b></div>
+    <div class="pill">Status: <b id="overall">Idle</b></div>
   </div>
 
   <div class="main-card">
     <div class="main-label">Screen 1 · REAL INSTAGRAM</div>
-    <div id="mainHolder" class="main-holder"><div class="placeholder">Paste a public Instagram Reel URL above and click <b>LOAD INSTAGRAM</b>.<br><br>Then press Play inside this real Instagram screen.</div></div>
+    <div id="mainHolder" class="main-holder"><div class="placeholder">Paste a public Instagram Reel URL above and click <b>LOAD INSTAGRAM</b>.<br><br>Press Play inside this real Instagram screen yourself.</div></div>
   </div>
 
   <div id="cloneGrid" class="clone-grid"></div>
+  <video id="masterVideo" class="hiddenMaster" playsinline muted preload="auto"></video>
 
-  <div class="notice"><b>How this works:</b> the top screen is the only real Instagram embed. The other 99 are visual clones and do not load Instagram 99 more times. After you press Play on the real screen, click <b>START CLONES</b> to make all clone screens visually run together.</div>
+  <div class="notice"><b>How it works:</b> the Instagram player is real only on Screen 1. The 99 boxes below are canvas clones of the local video file you choose. <b>START ALL CLONES</b> starts one local master video and mirrors every frame into all 99 boxes at the same time, so they visibly play in perfect sync without creating 99 Instagram sessions or views.</div>
 </div>
 
 <script>
 const TOTAL=100;
-let current=null;
-let timer=null;
-let elapsed=0;
-const grid=document.getElementById('cloneGrid');
+let currentInstagram=null;
+let objectUrl=null;
+let rafId=null;
 const holder=document.getElementById('mainHolder');
+const grid=document.getElementById('cloneGrid');
+const master=document.getElementById('masterVideo');
 const error=document.getElementById('error');
 const overall=document.getElementById('overall');
+const fileStatus=document.getElementById('fileStatus');
+const canvases=[];
 
 for(let i=2;i<=TOTAL;i++){
-  const d=document.createElement('div');
-  d.className='clone';
-  d.innerHTML='<div class="clone-num">Screen '+String(i).padStart(3,'0')+' · CLONE</div><div class="clone-center"><div class="ig">◎</div><div class="status"><span class="dot"></span><span>Idle</span></div><div class="short">No post loaded</div></div><div class="timer">00:00</div>';
-  grid.appendChild(d);
+  const box=document.createElement('div');
+  box.className='clone';
+  box.innerHTML='<div class="clone-num">Screen '+String(i).padStart(3,'0')+' · CLONE</div><canvas></canvas><div class="clone-status"><span class="dot"></span><span>Waiting</span></div>';
+  grid.appendChild(box);
+  canvases.push(box.querySelector('canvas'));
 }
+
+function setError(msg){error.textContent=msg||'';error.style.display=msg?'block':'none';}
 
 function parseInstagram(value){
   try{
@@ -65,38 +82,78 @@ function parseInstagram(value){
   }catch(e){return null;}
 }
 
-function resetClones(){
-  clearInterval(timer);timer=null;elapsed=0;overall.textContent='Idle';
-  document.querySelectorAll('.clone').forEach(x=>{
-    x.classList.remove('running');
-    x.querySelector('.status span:last-child').textContent=current?'Ready':'Idle';
-    x.querySelector('.timer').textContent='00:00';
-  });
-}
-function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
-function updateClonePost(code){document.querySelectorAll('.clone .short').forEach(x=>x.textContent='Instagram · '+code);document.querySelectorAll('.clone .status span:last-child').forEach(x=>x.textContent='Ready');}
-
 function loadInstagram(){
   const parsed=parseInstagram(document.getElementById('url').value);
-  if(!parsed){error.style.display='block';return;}
-  error.style.display='none';
-  current=parsed;
-  resetClones();
-  updateClonePost(parsed.code);
-  overall.textContent='Ready';
-  holder.innerHTML='<iframe src="'+parsed.embed+'" title="Instagram post" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen scrolling="yes"></iframe><div class="fallback hidden">If Instagram blocks the embed, <a href="'+parsed.canonical+'" target="_blank" rel="noopener">open the post on Instagram</a>.</div>';
+  if(!parsed){setError('Paste a valid public Instagram Reel or post URL.');return;}
+  setError('');
+  currentInstagram=parsed;
+  holder.innerHTML='<iframe src="'+parsed.embed+'" title="Instagram post" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen scrolling="yes"></iframe>';
 }
 
-function startClones(){
-  if(!current){error.style.display='block';return;}
-  error.style.display='none';
-  clearInterval(timer);elapsed=0;overall.textContent='Running';
-  document.querySelectorAll('.clone').forEach(x=>{x.classList.add('running');x.querySelector('.status span:last-child').textContent='Playing';x.querySelector('.timer').textContent='00:00';});
-  timer=setInterval(()=>{elapsed++;document.querySelectorAll('.clone .timer').forEach(t=>t.textContent=fmt(elapsed));},1000);
+function setupCanvases(){
+  const vw=master.videoWidth||720, vh=master.videoHeight||1280;
+  canvases.forEach(c=>{c.width=vw;c.height=vh;});
+  drawFrame();
 }
 
-document.getElementById('load').addEventListener('click',loadInstagram);
-document.getElementById('start').addEventListener('click',startClones);
+function drawFrame(){
+  if(master.readyState>=2 && master.videoWidth && master.videoHeight){
+    const vw=master.videoWidth, vh=master.videoHeight;
+    canvases.forEach(c=>{
+      const ctx=c.getContext('2d',{alpha:false});
+      if(c.width!==vw||c.height!==vh){c.width=vw;c.height=vh;}
+      ctx.drawImage(master,0,0,c.width,c.height);
+    });
+  }
+  if(!master.paused && !master.ended) rafId=requestAnimationFrame(drawFrame);
+}
+
+function loadLocalVideo(file){
+  if(objectUrl) URL.revokeObjectURL(objectUrl);
+  objectUrl=URL.createObjectURL(file);
+  master.src=objectUrl;
+  master.load();
+  fileStatus.textContent='Loading…';
+  master.onloadedmetadata=()=>{
+    fileStatus.textContent=file.name;
+    overall.textContent='Ready';
+    document.querySelectorAll('.clone-status span:last-child').forEach(x=>x.textContent='Ready');
+    setupCanvases();
+  };
+  master.onerror=()=>{fileStatus.textContent='Load failed';setError('That video file could not be loaded. Try MP4 (H.264).');};
+}
+
+async function startClones(){
+  if(!master.src){setError('Choose the video file first so Screens 2-100 can show the actual video.');return;}
+  setError('');
+  if(rafId) cancelAnimationFrame(rafId);
+  try{
+    master.currentTime=0;
+    master.muted=true;
+    await master.play();
+    overall.textContent='Playing';
+    document.querySelectorAll('.clone').forEach(x=>{x.classList.add('running');x.querySelector('.clone-status span:last-child').textContent='Playing';});
+    drawFrame();
+  }catch(e){setError('Browser blocked playback. Click START ALL CLONES again.');}
+}
+
+function stopClones(){
+  master.pause();
+  if(rafId) cancelAnimationFrame(rafId);
+  rafId=null;
+  overall.textContent='Stopped';
+  document.querySelectorAll('.clone').forEach(x=>{x.classList.remove('running');x.querySelector('.clone-status span:last-child').textContent='Stopped';});
+}
+
+master.addEventListener('ended',()=>{
+  overall.textContent='Finished';
+  document.querySelectorAll('.clone').forEach(x=>{x.classList.remove('running');x.querySelector('.clone-status span:last-child').textContent='Finished';});
+});
+
+document.getElementById('loadInstagram').addEventListener('click',loadInstagram);
+document.getElementById('videoFile').addEventListener('change',e=>{const f=e.target.files&&e.target.files[0];if(f)loadLocalVideo(f);});
+document.getElementById('startAll').addEventListener('click',startClones);
+document.getElementById('stopAll').addEventListener('click',stopClones);
 document.getElementById('url').addEventListener('keydown',e=>{if(e.key==='Enter')loadInstagram();});
 </script>
 </body>
