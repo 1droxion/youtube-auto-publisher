@@ -1,29 +1,103 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>100 Screen Playback Test</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Instagram 100 Screen Clone Test</title>
 <style>
-:root{--bg:#0b0d12;--panel:#151922;--panel2:#1d2431;--border:#30394b;--text:#fff;--muted:#9ba5b5;--accent:#6ea8fe;--ok:#48d597}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}.wrap{max-width:1600px;margin:auto;padding:24px 18px}h1{margin:0 0 6px;font-size:30px}.sub{color:var(--muted);margin-bottom:16px;line-height:1.45}.controls{display:grid;grid-template-columns:minmax(300px,1fr) auto auto;gap:10px;margin-bottom:14px}input{background:var(--panel);color:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;font-size:16px}button{border:1px solid var(--border);border-radius:10px;padding:14px 20px;background:var(--panel2);color:#fff;font-weight:800;font-size:15px;cursor:pointer}.primary{background:var(--accent);color:#07111f;border-color:transparent}.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.pill{background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:9px 12px;color:var(--muted);font-size:13px}.pill b{color:#fff}.real{background:#000;border:1px solid var(--border);border-radius:14px;overflow:hidden;min-height:520px;position:relative;margin-bottom:14px}.real iframe{width:100%;height:520px;border:0}.screen-head{position:absolute;z-index:3;left:10px;top:10px;background:rgba(0,0,0,.72);padding:7px 10px;border-radius:999px;font-size:12px}.sim-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}.sim{background:#10141c;border:1px solid var(--border);border-radius:10px;min-height:110px;padding:10px;display:flex;flex-direction:column;justify-content:space-between}.sim.running{background:#102019;border-color:#2d7558}.num{color:var(--muted);font-size:11px}.status{font-weight:800}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#697487;margin-right:6px}.running .dot{background:var(--ok);box-shadow:0 0 12px var(--ok)}.running .status{color:var(--ok)}.timer{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}.notice{margin-top:16px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:13px;line-height:1.5}.err{display:none;color:#ff9caf;margin:8px 0}.ig-wrap{height:520px;overflow:auto;background:#fff;display:flex;justify-content:center;align-items:flex-start;padding:42px 10px 10px}.placeholder{height:520px;display:grid;place-items:center;color:#858fa0;text-align:center;padding:30px}@media(max-width:700px){.controls{grid-template-columns:1fr}.real,.real iframe,.ig-wrap,.placeholder{height:360px;min-height:360px}.sim-grid{grid-template-columns:repeat(2,1fr)}}
+:root{--bg:#090b10;--panel:#141923;--panel2:#1c2330;--border:#2f3849;--text:#fff;--muted:#98a3b4;--accent:#7aa7ff;--ok:#4bd799;--pink:#ff4f8a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}.wrap{max-width:1500px;margin:auto;padding:24px 18px}h1{margin:0 0 6px;font-size:30px}.sub{color:var(--muted);margin-bottom:16px;line-height:1.45}.controls{display:grid;grid-template-columns:minmax(320px,1fr) auto auto;gap:10px;margin-bottom:12px}input{background:var(--panel);color:#fff;border:1px solid var(--border);border-radius:10px;padding:14px;font-size:16px}button{border:1px solid var(--border);border-radius:10px;padding:14px 20px;background:var(--panel2);color:#fff;font-weight:800;font-size:15px;cursor:pointer}.primary{background:var(--accent);color:#08101e;border-color:transparent}.error{display:none;color:#ff9caf;margin:8px 0}.stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}.pill{background:var(--panel);border:1px solid var(--border);border-radius:999px;padding:9px 12px;color:var(--muted);font-size:13px}.pill b{color:#fff}.main-card{background:#000;border:1px solid var(--border);border-radius:16px;overflow:hidden;position:relative;margin-bottom:14px;min-height:620px}.main-label{position:absolute;z-index:3;left:10px;top:10px;background:rgba(0,0,0,.75);padding:8px 11px;border-radius:999px;font-size:12px}.main-holder{width:100%;min-height:620px;display:grid;place-items:center;background:#000}.main-holder iframe{width:100%;max-width:540px;height:620px;border:0;background:#fff}.placeholder{color:#8c96a7;text-align:center;padding:30px;line-height:1.5}.clone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:8px}.clone{aspect-ratio:9/16;min-height:200px;background:linear-gradient(180deg,#171b24,#0d1016);border:1px solid var(--border);border-radius:12px;padding:9px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;position:relative}.clone::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 35%,rgba(255,79,138,.12),transparent 45%);pointer-events:none}.clone.running{border-color:#2e7358;background:linear-gradient(180deg,#14231d,#0d1512)}.clone-num{font-size:11px;color:var(--muted);position:relative;z-index:1}.clone-center{text-align:center;position:relative;z-index:1}.ig{font-size:28px;margin-bottom:8px}.status{font-weight:800;font-size:13px}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#6d7787;margin-right:6px}.running .dot{background:var(--ok);box-shadow:0 0 12px var(--ok)}.running .status{color:var(--ok)}.short{font-size:10px;color:#778293;margin-top:7px;word-break:break-all}.timer{font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;position:relative;z-index:1}.notice{margin-top:16px;padding:14px 16px;background:var(--panel);border:1px solid var(--border);border-radius:12px;color:var(--muted);font-size:13px;line-height:1.5}.fallback{margin-top:10px}.fallback a{color:#9ebcff}.hidden{display:none}@media(max-width:700px){.controls{grid-template-columns:1fr}.main-card,.main-holder{min-height:520px}.main-holder iframe{height:520px}.clone-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
-</head><body><div class="wrap">
-<h1>100 Screen Playback Test</h1>
-<div class="sub">Paste a public YouTube or Instagram URL. Screen 1 is the real platform player/embed. Screens 2-100 are synchronized simulations for UI/load testing.</div>
-<div class="controls"><input id="url" placeholder="Paste YouTube or Instagram URL"><button id="load">LOAD URL</button><button id="start" class="primary">START 100</button></div>
-<div id="err" class="err">Please paste a supported YouTube or Instagram URL.</div>
-<div class="stats"><div class="pill">Real platform players: <b>1</b></div><div class="pill">Simulated screens: <b>99</b></div><div class="pill">Status: <b id="overall">Idle</b></div></div>
-<div class="real" id="realScreen"><div class="screen-head">Screen 1 · REAL</div><div class="placeholder">Paste a URL and click <b>LOAD URL</b>.</div></div>
-<div class="sim-grid" id="simGrid"></div>
-<div class="notice"><b>Important:</b> this page does not create 100 platform views. Only Screen 1 is a real YouTube/Instagram embed. Screens 2-100 are local simulations. It does not fake human touches or automate artificial engagement.</div>
+</head>
+<body>
+<div class="wrap">
+  <h1>Instagram 100 Screen Clone Test</h1>
+  <div class="sub">Instagram only. Screen 1 is the real Instagram Reel/post embed. Screens 2-100 are lightweight visual clones of the same loaded post status.</div>
+  <div class="controls">
+    <input id="url" autocomplete="off" placeholder="Paste Instagram Reel/Post URL">
+    <button id="load">LOAD INSTAGRAM</button>
+    <button id="start" class="primary">START CLONES</button>
+  </div>
+  <div id="error" class="error">Paste a public Instagram Reel or post URL.</div>
+  <div class="stats">
+    <div class="pill">Real Instagram screen: <b>1</b></div>
+    <div class="pill">Visual clones: <b>99</b></div>
+    <div class="pill">Clone status: <b id="overall">Idle</b></div>
+  </div>
+
+  <div class="main-card">
+    <div class="main-label">Screen 1 · REAL INSTAGRAM</div>
+    <div id="mainHolder" class="main-holder"><div class="placeholder">Paste a public Instagram Reel URL above and click <b>LOAD INSTAGRAM</b>.<br><br>Then press Play inside this real Instagram screen.</div></div>
+  </div>
+
+  <div id="cloneGrid" class="clone-grid"></div>
+
+  <div class="notice"><b>How this works:</b> the top screen is the only real Instagram embed. The other 99 are visual clones and do not load Instagram 99 more times. After you press Play on the real screen, click <b>START CLONES</b> to make all clone screens visually run together.</div>
 </div>
-<script src="https://www.youtube.com/iframe_api"></script><script async src="https://www.instagram.com/embed.js"></script>
+
 <script>
-const TOTAL=100;let ytPlayer=null,loadedType=null,simTimer=null,elapsed=0;const simGrid=document.getElementById('simGrid'),realScreen=document.getElementById('realScreen'),overall=document.getElementById('overall'),err=document.getElementById('err');
-for(let i=2;i<=TOTAL;i++){const d=document.createElement('div');d.className='sim';d.innerHTML='<div class="num">Screen '+String(i).padStart(3,'0')+' · SIMULATED</div><div class="status"><span class="dot"></span><span>Idle</span></div><div class="timer">00:00</div>';simGrid.appendChild(d)}
-function parse(v){try{const u=new URL(v.trim()),h=u.hostname.replace(/^www\./,'');if(h==='youtu.be')return{type:'youtube',id:u.pathname.split('/').filter(Boolean)[0]};if(['youtube.com','m.youtube.com','music.youtube.com'].includes(h)){const q=u.searchParams.get('v');if(q)return{type:'youtube',id:q};const p=u.pathname.split('/').filter(Boolean);for(let i=0;i<p.length-1;i++)if(['embed','shorts','live'].includes(p[i]))return{type:'youtube',id:p[i+1]}}if(['instagram.com','m.instagram.com'].includes(h)){const p=u.pathname.split('/').filter(Boolean);if(p.length>=2&&['reel','reels','p','tv'].includes(p[0]))return{type:'instagram',url:u.origin+'/'+p[0]+'/'+p[1]+'/'}}catch(e){}return null}
-function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
-function reset(){clearInterval(simTimer);simTimer=null;elapsed=0;overall.textContent='Idle';document.querySelectorAll('.sim').forEach(x=>{x.classList.remove('running');x.querySelector('.status span:last-child').textContent='Idle';x.querySelector('.timer').textContent='00:00'})}
-function startSims(){reset();overall.textContent='Running';document.querySelectorAll('.sim').forEach(x=>{x.classList.add('running');x.querySelector('.status span:last-child').textContent='Playing'});simTimer=setInterval(()=>{elapsed++;document.querySelectorAll('.sim .timer').forEach(t=>t.textContent=fmt(elapsed))},1000)}
-function loadUrl(){const p=parse(document.getElementById('url').value);reset();if(!p){err.style.display='block';return}err.style.display='none';loadedType=p.type;ytPlayer=null;if(p.type==='youtube'){realScreen.innerHTML='<div class="screen-head">Screen 1 · REAL YOUTUBE</div><div id="ytReal" style="width:100%;height:520px"></div>';const build=()=>{ytPlayer=new YT.Player('ytReal',{videoId:p.id,playerVars:{playsinline:1,rel:0},events:{onReady:()=>overall.textContent='Ready'}})};if(window.YT&&YT.Player)build();else window.onYouTubeIframeAPIReady=build}else{realScreen.innerHTML='<div class="screen-head">Screen 1 · REAL INSTAGRAM</div><div class="ig-wrap"><blockquote class="instagram-media" data-instgrm-permalink="'+p.url+'" data-instgrm-version="14" style="background:#fff;border:0;margin:0;max-width:540px;min-width:326px;width:100%"></blockquote></div>';overall.textContent='Ready';setTimeout(()=>{if(window.instgrm&&instgrm.Embeds)instgrm.Embeds.process()},100)}}
-function start100(){if(!loadedType){err.style.display='block';return}err.style.display='none';startSims();if(loadedType==='youtube'&&ytPlayer&&typeof ytPlayer.playVideo==='function')ytPlayer.playVideo()}
-document.getElementById('load').onclick=loadUrl;document.getElementById('start').onclick=start100;document.getElementById('url').addEventListener('keydown',e=>{if(e.key==='Enter')loadUrl()});
-</script></body></html>
+const TOTAL=100;
+let current=null;
+let timer=null;
+let elapsed=0;
+const grid=document.getElementById('cloneGrid');
+const holder=document.getElementById('mainHolder');
+const error=document.getElementById('error');
+const overall=document.getElementById('overall');
+
+for(let i=2;i<=TOTAL;i++){
+  const d=document.createElement('div');
+  d.className='clone';
+  d.innerHTML='<div class="clone-num">Screen '+String(i).padStart(3,'0')+' · CLONE</div><div class="clone-center"><div class="ig">◎</div><div class="status"><span class="dot"></span><span>Idle</span></div><div class="short">No post loaded</div></div><div class="timer">00:00</div>';
+  grid.appendChild(d);
+}
+
+function parseInstagram(value){
+  try{
+    const u=new URL(value.trim());
+    const h=u.hostname.replace(/^www\./,'');
+    if(!['instagram.com','m.instagram.com'].includes(h)) return null;
+    const p=u.pathname.split('/').filter(Boolean);
+    if(p.length<2 || !['reel','reels','p','tv'].includes(p[0])) return null;
+    const kind=p[0]==='reels'?'reel':p[0];
+    const code=p[1];
+    return {kind,code,canonical:'https://www.instagram.com/'+kind+'/'+code+'/',embed:'https://www.instagram.com/'+kind+'/'+code+'/embed/'};
+  }catch(e){return null;}
+}
+
+function resetClones(){
+  clearInterval(timer);timer=null;elapsed=0;overall.textContent='Idle';
+  document.querySelectorAll('.clone').forEach(x=>{
+    x.classList.remove('running');
+    x.querySelector('.status span:last-child').textContent=current?'Ready':'Idle';
+    x.querySelector('.timer').textContent='00:00';
+  });
+}
+function fmt(s){return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+function updateClonePost(code){document.querySelectorAll('.clone .short').forEach(x=>x.textContent='Instagram · '+code);document.querySelectorAll('.clone .status span:last-child').forEach(x=>x.textContent='Ready');}
+
+function loadInstagram(){
+  const parsed=parseInstagram(document.getElementById('url').value);
+  if(!parsed){error.style.display='block';return;}
+  error.style.display='none';
+  current=parsed;
+  resetClones();
+  updateClonePost(parsed.code);
+  overall.textContent='Ready';
+  holder.innerHTML='<iframe src="'+parsed.embed+'" title="Instagram post" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen scrolling="yes"></iframe><div class="fallback hidden">If Instagram blocks the embed, <a href="'+parsed.canonical+'" target="_blank" rel="noopener">open the post on Instagram</a>.</div>';
+}
+
+function startClones(){
+  if(!current){error.style.display='block';return;}
+  error.style.display='none';
+  clearInterval(timer);elapsed=0;overall.textContent='Running';
+  document.querySelectorAll('.clone').forEach(x=>{x.classList.add('running');x.querySelector('.status span:last-child').textContent='Playing';x.querySelector('.timer').textContent='00:00';});
+  timer=setInterval(()=>{elapsed++;document.querySelectorAll('.clone .timer').forEach(t=>t.textContent=fmt(elapsed));},1000);
+}
+
+document.getElementById('load').addEventListener('click',loadInstagram);
+document.getElementById('start').addEventListener('click',startClones);
+document.getElementById('url').addEventListener('keydown',e=>{if(e.key==='Enter')loadInstagram();});
+</script>
+</body>
+</html>
