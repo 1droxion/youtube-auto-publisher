@@ -1,0 +1,107 @@
+name: YouTube Pro Batch Publisher
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_urls:
+        description: 'Paste 2-20 public source URLs separated by commas, semicolons, |, or new lines. Use only clips you own or have permission/license to reuse.'
+        required: true
+        type: string
+      privacy:
+        description: 'YouTube privacy status'
+        required: true
+        default: 'private'
+        type: choice
+        options:
+          - private
+          - unlisted
+          - public
+      music_policy:
+        description: 'Music handling policy'
+        required: true
+        default: 'stop'
+        type: choice
+        options:
+          - stop
+          - mute
+          - ignore
+      broll_count:
+        description: 'AI-generated visual cutaways'
+        required: true
+        default: '2'
+        type: choice
+        options:
+          - '0'
+          - '1'
+          - '2'
+          - '3'
+      rights_ok:
+        description: 'I confirm I own or have permission/license to reuse every source clip'
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  publish:
+    if: ${{ inputs.rights_ok == true }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    permissions:
+      contents: read
+    env:
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      YOUTUBE_TOKEN_JSON: ${{ secrets.YOUTUBE_TOKEN_JSON }}
+      AUDD_API_TOKEN: ${{ secrets.AUDD_API_TOKEN }}
+      OPENAI_TEXT_MODEL: gpt-5-mini
+      OPENAI_IMAGE_MODEL: gpt-image-1
+      OPENAI_TRANSCRIBE_MODEL: whisper-1
+      PRO_BATCH_SOURCE_URLS: ${{ inputs.source_urls }}
+      YOUTUBE_CATEGORY_ID: '24'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install FFmpeg
+        shell: bash
+        run: |
+          set -e
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ffmpeg fontconfig fonts-dejavu-core
+          ffmpeg -filters | grep -q subtitles
+
+      - name: Install Python requirements
+        run: python -m pip install -r requirements.txt
+
+      - name: Validate required secrets
+        shell: bash
+        run: |
+          set -e
+          test -n "$OPENAI_API_KEY" || (echo 'Missing OPENAI_API_KEY' && exit 1)
+          test -n "$YOUTUBE_TOKEN_JSON" || (echo 'Missing YOUTUBE_TOKEN_JSON' && exit 1)
+          if [ "${{ inputs.music_policy }}" != "ignore" ]; then
+            test -n "$AUDD_API_TOKEN" || (echo 'Missing AUDD_API_TOKEN for music scanning' && exit 1)
+          fi
+
+      - name: Build professional video and publish
+        run: >-
+          python batch_main.py
+          --urls-env PRO_BATCH_SOURCE_URLS
+          --rights-ok
+          --music-policy "${{ inputs.music_policy }}"
+          --privacy "${{ inputs.privacy }}"
+          --broll-count "${{ inputs.broll_count }}"
+
+      - name: Upload processing package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: youtube-pro-batch-${{ github.run_id }}
+          path: output/
+          if-no-files-found: warn
+          retention-days: 7
